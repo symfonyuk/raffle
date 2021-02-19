@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use Aws\DynamoDb\DynamoDbClient;
+use Aws\DynamoDb\Marshaler;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -18,10 +20,13 @@ final class RaffleFormController
 
     private Environment $twig;
 
-    public function __construct(FormFactoryInterface $formFactory, Environment $twig)
+    private DynamoDbClient $dynamoDbClient;
+
+    public function __construct(FormFactoryInterface $formFactory, Environment $twig, DynamoDbClient $dynamoDbClient)
     {
         $this->formFactory = $formFactory;
         $this->twig = $twig;
+        $this->dynamoDbClient = $dynamoDbClient;
     }
 
     public function form(Request $request): Response
@@ -33,14 +38,22 @@ final class RaffleFormController
             ->getForm();
 
         $form->handleRequest($request);
+        $marshaler = new Marshaler();
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // data is an array with "name", "email"
+
             $data = $form->getData();
+
+            $data['date_entered'] = (new \DateTimeImmutable())->format('Y-m-d');
+
+            $this->dynamoDbClient->putItem([
+                'TableName' => 'SymfonyUkRaffleEntries',
+                'Item' => $marshaler->marshalItem($data)
+            ]);
 
             return new Response(
                 $this->twig->render('form-submitted.html.twig', [
-                    'form' => $form->createView()
+                    'form' => $form->createView(),
                 ])
             );
         }
