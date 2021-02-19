@@ -1,0 +1,54 @@
+version: "3"
+
+networks:
+  symfony-uk-raffle_php_node:
+
+services:
+  symfony-uk-raffle_nginx_service:
+    image: nginx:stable-alpine
+    container_name: symfony-uk-raffle_nginx_container
+    ports:
+      - "8081:80"
+    volumes:
+      - .:/var/www/project
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - symfony-uk-raffle_php_service
+      - symfony-uk-raffle_dynamodb_service
+    networks:
+      - symfony-uk-raffle_php_node
+
+  symfony-uk-raffle_php_service:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    container_name: symfony-uk-raffle_php_container
+    ports:
+      - "9000:9000"
+    volumes:
+      - .:/var/www/project
+    networks:
+      - symfony-uk-raffle_php_node
+    environment:
+      AWS_ACCESS_KEY_ID: 'DUMMY_ACCESS_KEY_ID'
+      AWS_SECRET_ACCESS_KEY: 'DUMMY_SECRET_ACCESS_KEY'
+      REGION: 'eu-west-1'
+
+  symfony-uk-raffle_node_service:
+    image: node:14
+    container_name: symfony-uk-raffle_node_container
+    working_dir: /var/www/project
+    volumes:
+      - .:/var/www/project
+    networks:
+      - symfony-uk-raffle_php_node
+
+  symfony-uk-raffle_dynamodb_service:
+    command: "-jar DynamoDBLocal.jar -sharedDb -optimizeDbBeforeStartup -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
