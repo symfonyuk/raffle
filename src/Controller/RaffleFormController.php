@@ -38,7 +38,11 @@ final class RaffleFormController
             // data is an array with "name", "email"
             $data = $form->getData();
 
-            // save the data
+            return new Response(
+                $this->twig->render('form-submitted.html.twig', [
+                    'form' => $form->createView()
+                ])
+            );
         }
 
         return new Response(
