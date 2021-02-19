@@ -1,7 +1,7 @@
 version: "3"
 
 networks:
-  symfony-uk-raffle_php_node:
+  symfony-uk-raffle_php_node_dynamodb:
 
 services:
   symfony-uk-raffle_nginx_service:
@@ -16,7 +16,7 @@ services:
       - symfony-uk-raffle_php_service
       - symfony-uk-raffle_dynamodb_service
     networks:
-      - symfony-uk-raffle_php_node
+      - symfony-uk-raffle_php_node_dynamodb
 
   symfony-uk-raffle_php_service:
     build:
@@ -28,7 +28,7 @@ services:
     volumes:
       - .:/var/www/project
     networks:
-      - symfony-uk-raffle_php_node
+      - symfony-uk-raffle_php_node_dynamodb
     environment:
       AWS_ACCESS_KEY_ID: 'DUMMY_ACCESS_KEY_ID'
       AWS_SECRET_ACCESS_KEY: 'DUMMY_SECRET_ACCESS_KEY'
@@ -41,7 +41,7 @@ services:
     volumes:
       - .:/var/www/project
     networks:
-      - symfony-uk-raffle_php_node
+      - symfony-uk-raffle_php_node_dynamodb
 
   symfony-uk-raffle_dynamodb_service:
     command: "-jar DynamoDBLocal.jar -sharedDb -optimizeDbBeforeStartup -dbPath ./data"
@@ -52,3 +52,5 @@ services:
     volumes:
       - "./docker/dynamodb:/home/dynamodblocal/data"
     working_dir: /home/dynamodblocal
+    networks:
+      - symfony-uk-raffle_php_node_dynamodb

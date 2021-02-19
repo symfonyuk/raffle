@@ -16,6 +16,8 @@ final class CreateRaffleTableCommand extends Command
 
     private DynamoDbClient $dynamoDbClient;
 
+    public const TABLE_NAME = 'SymfonyUkRaffleEntries';
+
     public function __construct(DynamoDbClient $dynamoDbClient)
     {
         parent::__construct(self::$defaultName);
@@ -26,7 +28,7 @@ final class CreateRaffleTableCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $params = [
-            'TableName' => 'SymfonyUkRaffleEntries',
+            'TableName' => self::TABLE_NAME,
             'KeySchema' => [
                 [
                     'AttributeName' => 'date_entered',

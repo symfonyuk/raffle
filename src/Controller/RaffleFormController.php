@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Command\CreateRaffleTableCommand;
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Marshaler;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -47,7 +48,7 @@ final class RaffleFormController
             $data['date_entered'] = (new \DateTimeImmutable())->format('Y-m-d');
 
             $this->dynamoDbClient->putItem([
-                'TableName' => 'SymfonyUkRaffleEntries',
+                'TableName' => CreateRaffleTableCommand::TABLE_NAME,
                 'Item' => $marshaler->marshalItem($data)
             ]);
 
