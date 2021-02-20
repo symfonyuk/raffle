@@ -41,3 +41,8 @@ services:
                 region: '%dynamodb_region%'
                 endpoint: '%dynamodb_endpoint%'
                 version: 'latest'
+
+    session.dynamodb_handler:
+        class: Aws\DynamoDb\SessionHandler
+        factory: ['Aws\DynamoDb\SessionHandler', fromClient]
+        arguments: ['@Aws\DynamoDb\DynamoDbClient']
