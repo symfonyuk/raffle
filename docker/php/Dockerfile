@@ -8,5 +8,5 @@ RUN apt-get update && apt-get install -y zlib1g-dev g++ git libicu-dev zip libzi
     && docker-php-ext-install gd
 
 WORKDIR /var/www/project
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
