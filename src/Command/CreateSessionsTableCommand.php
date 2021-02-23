@@ -16,7 +16,7 @@ final class CreateSessionsTableCommand extends Command
 
     private DynamoDbClient $dynamoDbClient;
 
-    private const TABLE_NAME = 'sessions';
+    private const TABLE_NAME = 'symfony-uk-raffle-sessions';
 
     public function __construct(DynamoDbClient $dynamoDbClient)
     {

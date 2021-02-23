@@ -86,6 +86,12 @@ if (Encore.isProduction()) {
             return content.match(/[\w-/:]+(?<!:)/g) || [];
         }
     }));
+
+    Encore.setPublicPath('https://s3-eu-west-1.amazonaws.com/assets.symfonymeetup.org.uk');
+    // guarantee that the keys in manifest.json are *still*
+    // prefixed with build/
+    // (e.g. "build/dashboard.js": "https://my-cool-app.com.global.prod.fastly.net/dashboard.js")
+    Encore.setManifestKeyPrefix('build/');
 }
 
 module.exports = Encore.getWebpackConfig();

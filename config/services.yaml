@@ -4,8 +4,6 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    dynamodb_aws_key: '%env(AWS_ACCESS_KEY_ID)%'
-    dynamodb_aws_secret: '%env(AWS_SECRET_ACCESS_KEY)%'
     dynamodb_endpoint: '%env(DYNAMO_DB_ENDPOINT)%'
     dynamodb_region: '%env(AWS_REGION)%'
 
@@ -45,4 +43,4 @@ services:
     session.dynamodb_handler:
         class: Aws\DynamoDb\SessionHandler
         factory: ['Aws\DynamoDb\SessionHandler', fromClient]
-        arguments: ['@Aws\DynamoDb\DynamoDbClient']
+        arguments: ['@Aws\DynamoDb\DynamoDbClient', { table_name: 'symfony-uk-raffle-sessions' }]

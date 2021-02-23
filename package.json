@@ -9,6 +9,7 @@
     "webpack-notifier": "^1.6.0"
   },
   "dependencies": {
-    "postcss": "^8.2.6"
+    "postcss": "^8.2.6",
+    "serverless": "^2.25.2"
   }
 }

@@ -1,0 +1,108 @@
+service: symfony-uk-raffle
+
+provider:
+  name: aws
+  region: eu-west-1
+  runtime: provided.al2
+  environment:
+    # Symfony environment variables
+    APP_ENV: prod
+    DYNAMO_DB_ENDPOINT: https://dynamodb.eu-west-1.amazonaws.com
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "*"
+
+plugins:
+  - ./vendor/bref/bref
+
+package:
+  exclude:
+    - node_modules/**
+    - tests/**
+    - var/**
+
+functions:
+  website:
+    handler: public/index.php
+    timeout: 10 # in seconds (API Gateway has a timeout of 29 seconds)
+    layers:
+      - ${bref:layer.php-74-fpm}
+    events:
+      - http: 'ANY /'
+      - http: 'ANY /{proxy+}'
+  console:
+    handler: bin/console
+    timeout: 120 # in seconds
+    layers:
+      - ${bref:layer.php-74} # PHP
+      - ${bref:layer.console} # The "console" layer
+
+resources:
+  Resources:
+    SessionsDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: "id"
+            AttributeType: "S"
+        KeySchema:
+          -
+            AttributeName: "id"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: symfony-uk-raffle-sessions
+
+    SymfonyUkRaffleEntriesDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: "date_entered"
+            AttributeType: "S"
+          -
+            AttributeName: "email"
+            AttributeType: "S"
+        KeySchema:
+          -
+            AttributeName: "date_entered"
+            KeyType: "HASH"
+          -
+            AttributeName: "email"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: SymfonyUkRaffleEntries
+
+    Assets:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: assets.symfonymeetup.org.uk
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders: ["*"]
+              AllowedMethods: [GET]
+              AllowedOrigins: ["*"]
+      # The policy that makes the bucket publicly readable
+    AssetsBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref Assets # References the bucket we defined above
+        PolicyDocument:
+          Statement:
+            -   Effect: Allow
+                Principal: '*' # everyone
+                Action: 's3:GetObject' # to read
+                Resource: !Join ['/', [!GetAtt Assets.Arn, '*']] # things in the bucket
+              # alternatively you can write out Resource: 'arn:aws:s3:::<bucket-name>/*'
