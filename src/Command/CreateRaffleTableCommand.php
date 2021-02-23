@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class CreateRaffleTableCommand extends Command
 {
-    protected static $defaultName = 'app:create-raffle-table';
+    protected static $defaultName = 'dev:create-raffle-table';
 
     private DynamoDbClient $dynamoDbClient;
 

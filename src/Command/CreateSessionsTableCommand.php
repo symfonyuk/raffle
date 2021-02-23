@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class CreateSessionsTableCommand extends Command
 {
-    protected static $defaultName = 'app:create-sessions-table';
+    protected static $defaultName = 'dev:create-sessions-table';
 
     private DynamoDbClient $dynamoDbClient;
 
