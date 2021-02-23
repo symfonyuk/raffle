@@ -8,6 +8,7 @@ provider:
     # Symfony environment variables
     APP_ENV: prod
     DYNAMO_DB_ENDPOINT: https://dynamodb.eu-west-1.amazonaws.com
+    APP_SECRET: ${sls:instanceId}
 
   iamRoleStatements:
     - Effect: "Allow"
