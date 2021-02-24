@@ -1,6 +1,8 @@
 up:
+ifneq ($(OS),Windows_NT)
 	mkdir -p docker/dynamodb
-	sudo chmod 777 docker/dynamodb
+	sudo chmod -R 777 docker/dynamodb
+endif
 	docker-compose up -d
 	docker-compose run symfony-uk-raffle_php_service composer install
 	docker-compose run symfony-uk-raffle_php_service php bin/console dev:create-sessions-table
